@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>শিক্ষকবৃন্দ</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 20px;
+      background: #f9f9f9;
+      max-width: 900px;
+    }
+    header {
+      background: #4b0082;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      margin-bottom: 20px;
+      border-radius: 5px;
+    }
+    input, button {
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      width: 100%;
+    }
+    button {
+      background: #4b0082;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #6a2ea0;
+    }
+    #addTeacherForm {
+      display: none;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .remove-btn {
+      background: #e60000;
+      color: white;
+      padding: 5px 10px;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    .remove-btn:hover {
+      background: #c40000;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: white;
+    }
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+    }
+    th {
+      background: #4b0082;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>শিক্ষকবৃন্দ ম্যানেজমেন্ট</h1>
+  <div id="userStatus"></div>
+  <button id="logoutBtn" style="display:none; margin-top:10px;">লগআউট</button>
+</header>
+
+<button id="addTeacherBtn" style="display:none;" onclick="toggleAddForm()">নতুন শিক্ষক যোগ করুন</button>
+
+<div id="addTeacherForm">
+  <form id="teacherForm">
+    <input type="text" id="name" placeholder="নাম" required />
+    <input type="text" id="subject" placeholder="বিষয়" required />
+    <input type="tel" id="phone" placeholder="ফোন নম্বর" />
+    <button type="submit">যোগ করুন</button>
+  </form>
+</div>
+
+<div id="teachersContainer">লোড হচ্ছে...</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyCaQeqVWyUVW4kIFgox0fOiUKXbQoz1OiM",
+    authDomain: "dhunat-school.firebaseapp.com",
+    projectId: "dhunat-school",
+    storageBucket: "dhunat-school.appspot.com",
+    messagingSenderId: "271256090455",
+    appId: "1:271256090455:web:b34e8be97a26191512b012"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  const ADMIN_EMAIL = "exptlikhonsarkar@gmail.com";
+
+  const addForm = document.getElementById('addTeacherForm');
+  const teacherForm = document.getElementById('teacherForm');
+  const addTeacherBtn = document.getElementById('addTeacherBtn');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const userStatus = document.getElementById('userStatus');
+  const teachersContainer = document.getElementById('teachersContainer');
+
+  auth.onAuthStateChanged(user => {
+    if (user) {
+      userStatus.textContent = `আপনি লগইন করেছেন: ${user.email}`;
+      logoutBtn.style.display = 'inline-block';
+      if (user.email === ADMIN_EMAIL) {
+        addTeacherBtn.style.display = 'inline-block';
+      }
+      loadTeachers();
+    } else {
+      userStatus.textContent = 'আপনি লগইন করেননি।';
+      logoutBtn.style.display = 'none';
+      addTeacherBtn.style.display = 'none';
+      teachersContainer.innerHTML = '<p>দয়া করে লগইন করুন শিক্ষক দেখতে।</p>';
+    }
+  });
+
+  logoutBtn.onclick = () => auth.signOut();
+
+  function toggleAddForm() {
+    addForm.style.display = addForm.style.display === 'block' ? 'none' : 'block';
+  }
+
+  teacherForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const user = auth.currentUser;
+    if (!user || user.email !== ADMIN_EMAIL) {
+      alert("শুধু অ্যাডমিন শিক্ষক যোগ করতে পারবেন।");
+      return;
+    }
+
+    const name = document.getElementById('name').value.trim();
+    const subject = document.getElementById('subject').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+
+    try {
+      await db.collection("teachers").add({
+        name, subject, phone,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      alert("শিক্ষক যোগ করা হয়েছে");
+      teacherForm.reset();
+      addForm.style.display = 'none';
+      loadTeachers();
+
+    } catch (err) {
+      console.error("ত্রুটি:", err);
+      alert("যোগ করতে সমস্যা হয়েছে");
+    }
+  });
+
+  async function loadTeachers() {
+    teachersContainer.innerHTML = "লোড হচ্ছে...";
+    try {
+      const snapshot = await db.collection("teachers").orderBy("createdAt", "desc").get();
+      if (snapshot.empty) {
+        teachersContainer.innerHTML = "<p>কোনো শিক্ষক পাওয়া যায়নি।</p>";
+        return;
+      }
+
+      let html = `<table><tr><th>নাম</th><th>বিষয়</th><th>ফোন</th><th>অপশন</th></tr>`;
+      snapshot.forEach(doc => {
+        const d = doc.data();
+        html += `<tr>
+          <td>${d.name}</td>
+          <td>${d.subject}</td>
+          <td>${d.phone}</td>
+          <td>${auth.currentUser && auth.currentUser.email === ADMIN_EMAIL
+              ? `<button class="remove-btn" onclick="deleteTeacher('${doc.id}')">মুছুন</button>` : "-"}</td>
+        </tr>`;
+      });
+      html += `</table>`;
+      teachersContainer.innerHTML = html;
+
+    } catch (err) {
+      console.error("লোড ত্রুটি:", err);
+      teachersContainer.innerHTML = "<p>লোড করতে সমস্যা হয়েছে।</p>";
+    }
+  }
+
+  async function deleteTeacher(id) {
+    if (!confirm("আপনি কি মুছে ফেলতে চান?")) return;
+    try {
+      await db.collection("teachers").doc(id).delete();
+      alert("মুছে ফেলা হয়েছে");
+      loadTeachers();
+    } catch (err) {
+      console.error("ডিলিট ত্রুটি:", err);
+      alert("মুছে ফেলতে সমস্যা হয়েছে");
+    }
+  }
+</script>
+
+</body>
+</html>

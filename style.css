@@ -1,0 +1,112 @@
+body {
+  font-family: 'Hind Siliguri', sans-serif;
+  background: linear-gradient(135deg, #2a4d8f, #6b3f92); /* নীল থেকে বেগুনি গ্রেডিয়েন্ট */
+  color: #f1f1f1; /* হালকা সাদা টেক্সট */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  background: rgba(43, 60, 124, 0.85); /* গাঢ় নীল, একটু ট্রান্সপারেন্ট */
+  backdrop-filter: blur(8px);
+  padding: 25px 40px;
+  box-shadow: 0 2px 15px rgba(0,0,0,0.3);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #ffca28; /* সোনালী/হলুদ হেডার টেক্সট */
+}
+
+header h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  max-width: 70%;
+  text-shadow: 1px 1px 3px #222;
+}
+
+nav a {
+  color: #ffca28; /* হলুদ লিঙ্ক */
+  margin-left: 25px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1rem;
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+nav a::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  background: #ffca28; /* হলুদ আন্ডারলাইন */
+  bottom: -5px;
+  left: 0;
+  transition: width 0.3s ease;
+}
+
+nav a:hover {
+  color: #ffe082; /* হালকা হলুদ হোভার */
+}
+
+nav a:hover::after {
+  width: 100%;
+}
+
+main {
+  flex-grow: 1;
+  padding: 60px 40px;
+  max-width: 900px;
+  margin: 0 auto;
+  background: rgba(255,255,255,0.95);
+  border-radius: 15px;
+  box-shadow: 0 12px 30px rgba(43, 60, 124, 0.25);
+  color: #2c3e50;
+  text-align: center;
+}
+
+main .welcome h2 {
+  font-size: 2.2rem;
+  margin-bottom: 20px;
+  font-weight: 700;
+  color: #2a4d8f; /* নীল */
+  letter-spacing: 1px;
+}
+
+main .welcome p {
+  font-size: 1.15rem;
+  line-height: 1.6;
+  max-width: 700px;
+  margin: 0 auto 40px;
+  color: #444;
+}
+
+main .info h3 {
+  font-size: 1.6rem;
+  margin-bottom: 15px;
+  color: #6b3f92; /* বেগুনি */
+  font-weight: 600;
+  text-align: left;
+  border-left: 5px solid #ffca28; /* সোনালী বর্ডার */
+  padding-left: 12px;
+  margin-top: 30px;
+}
+
+main .info p {
+  font-size: 1rem;
+  line-height: 1.5;
+  text-align: justify;
+  color: #555;
+}
+
+footer {
+  background: rgba(43, 60, 124, 0.9); /* গাঢ় নীল */
+  color: #ffca28; /* হলুদ টেক্সট */
+  text-align: center;
+  padding: 20px 10px;
+  font-size: 0.9rem;
+  letter-spacing: 0.8px;
+  margin-top: 40px;
+}

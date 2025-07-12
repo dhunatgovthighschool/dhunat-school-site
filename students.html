@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <title>ছাত্রছাত্রী ম্যানেজমেন্ট - ধুনট সরকারি নইম উদ্দিন পাইলট মডেল উচ্চ বিদ্যালয়</title>
+  <style>
+    body {
+      font-family: 'Hind Siliguri', sans-serif;
+      max-width: 900px;
+      margin: 30px auto;
+      background: #f9f9f9;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #4b0082;
+    }
+    form {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+    }
+    label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+    input, select {
+      width: 100%;
+      padding: 8px 10px;
+      margin-top: 4px;
+      margin-bottom: 18px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+    button {
+      background: #4b0082;
+      color: white;
+      font-size: 1.1rem;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #6a2ea0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    th, td {
+      padding: 12px 10px;
+      border-bottom: 1px solid #ddd;
+      text-align: center;
+      font-size: 0.95rem;
+    }
+    th {
+      background: #4b0082;
+      color: white;
+    }
+    tr:hover {
+      background: #f0e6ff;
+    }
+    .delete-btn {
+      background: #d9534f;
+      border: none;
+      padding: 6px 12px;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .delete-btn:hover {
+      background: #c9302c;
+    }
+    #searchInput {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 20px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 7px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>ছাত্রছাত্রী ম্যানেজমেন্ট</h2>
+
+  <form id="studentForm">
+    <label>নামের পূর্ণরূপ: <input type="text" id="name" required /></label>
+    <label>পিতার নাম: <input type="text" id="father" required /></label>
+    <label>মাতার নাম: <input type="text" id="mother" required /></label>
+    <label>জন্ম তারিখ: <input type="date" id="dob" required /></label>
+    <label>শ্রেণী:
+      <select id="class" required>
+        <option value="">-- বাছাই করুন --</option>
+        <option value="6">৬</option>
+        <option value="7">৭</option>
+        <option value="8">৮</option>
+        <option value="9">৯</option>
+        <option value="10">১০</option>
+      </select>
+    </label>
+    <label>রোল নাম্বার: <input type="number" id="roll" required /></label>
+    <label>বিভাগ:
+      <select id="division" required>
+        <option value="">-- বাছাই করুন --</option>
+        <option value="Science">বিজ্ঞান</option>
+        <option value="Humanities">মানবিক</option>
+        <option value="Commerce">বাণিজ্য</option>
+      </select>
+    </label>
+    <label>মোবাইল নাম্বার: <input type="tel" id="mobile" required /></label>
+    <button type="submit">ছাত্রছাত্রী যোগ করুন</button>
+  </form>
+
+  <input type="text" id="searchInput" placeholder="অনুসন্ধান করুন (নাম, শ্রেণী, বিভাগ)" />
+
+  <table>
+    <thead>
+      <tr>
+        <th>নাম</th>
+        <th>শ্রেণী</th>
+        <th>বিভাগ</th>
+        <th>রোল</th>
+        <th>মোবাইল</th>
+        <th>মুছে ফেলুন</th>
+      </tr>
+    </thead>
+    <tbody id="studentsBody"></tbody>
+  </table>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCaQeqVWyUVW4kIFgox0fOiUKXbQoz1OiM",
+      authDomain: "dhunat-school.firebaseapp.com",
+      projectId: "dhunat-school",
+      storageBucket: "dhunat-school.firebasestorage.app",
+      messagingSenderId: "271256090455",
+      appId: "1:271256090455:web:b34e8be97a26191512b012"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const form = document.getElementById('studentForm');
+    const studentsBody = document.getElementById('studentsBody');
+    const searchInput = document.getElementById('searchInput');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('name').value.trim();
+      const father = document.getElementById('father').value.trim();
+      const mother = document.getElementById('mother').value.trim();
+      const dob = document.getElementById('dob').value;
+      const studentClass = document.getElementById('class').value;
+      const roll = document.getElementById('roll').value.trim();
+      const division = document.getElementById('division').value;
+      const mobile = document.getElementById('mobile').value.trim();
+
+      try {
+        await db.collection("students").add({
+          name, father, mother, dob,
+          class: studentClass,
+          roll, division, mobile,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        alert("তথ্য সফলভাবে সংরক্ষিত হয়েছে।");
+        form.reset();
+        loadStudents();
+
+      } catch (err) {
+        alert("ত্রুটি হয়েছে: " + err.message);
+        console.error(err);
+      }
+    });
+
+    async function loadStudents() {
+      studentsBody.innerHTML = '<tr><td colspan="6">লোড হচ্ছে...</td></tr>';
+      try {
+        const snapshot = await db.collection("students").orderBy("createdAt", "desc").get();
+        if (snapshot.empty) {
+          studentsBody.innerHTML = '<tr><td colspan="6">কোনো তথ্য পাওয়া যায়নি।</td></tr>';
+          return;
+        }
+
+        let rows = '';
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          rows += `
+            <tr>
+              <td>${data.name}</td>
+              <td>${data.class}</td>
+              <td>${data.division}</td>
+              <td>${data.roll}</td>
+              <td>${data.mobile}</td>
+              <td><button class="delete-btn" onclick="deleteStudent('${doc.id}')">মুছে ফেলুন</button></td>
+            </tr>
+          `;
+        });
+
+        studentsBody.innerHTML = rows;
+
+      } catch (err) {
+        console.error("তালিকা লোড করতে সমস্যা:", err);
+        studentsBody.innerHTML = '<tr><td colspan="6">তথ্য লোডে সমস্যা হয়েছে।</td></tr>';
+      }
+    }
+
+    async function deleteStudent(id) {
+      if (!confirm("আপনি কি নিশ্চিত মুছে ফেলতে চান?")) return;
+      try {
+        await db.collection("students").doc(id).delete();
+        alert("তথ্য মুছে ফেলা হয়েছে।");
+        loadStudents();
+      } catch (err) {
+        console.error("মুছতে সমস্যা:", err);
+        alert("মুছতে সমস্যা হয়েছে।");
+      }
+    }
+
+    searchInput.addEventListener('input', () => {
+      const filter = searchInput.value.toLowerCase();
+      const rows = studentsBody.getElementsByTagName('tr');
+      Array.from(rows).forEach(row => {
+        const name = row.cells[0].textContent.toLowerCase();
+        const studentClass = row.cells[1].textContent.toLowerCase();
+        const division = row.cells[2].textContent.toLowerCase();
+        row.style.display = name.includes(filter) || studentClass.includes(filter) || division.includes(filter) ? '' : 'none';
+      });
+    });
+
+    window.onload = loadStudents;
+  </script>
+
+</body>
+</html>

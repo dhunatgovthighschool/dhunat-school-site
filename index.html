@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ধুনট সরকারি নইম উদ্দিন পাইলট মডেল উচ্চ বিদ্যালয়</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri&display=swap');
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Hind Siliguri', sans-serif;
+      background: linear-gradient(135deg, #2a4d8f, #6b3f92);
+      color: #333;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      max-width: 900px;
+      margin: auto;
+    }
+    header {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      padding: 15px 20px;
+      box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #fff;
+      margin-bottom: 30px;
+      border-radius: 10px;
+      flex-wrap: wrap;
+    }
+    header img#logoImg {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-right: 15px;
+      flex-shrink: 0;
+    }
+    header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      color: #fff;
+      text-shadow: 2px 2px 6px rgba(0,0,0,0.3);
+      flex-grow: 1;
+      min-width: 180px;
+    }
+    nav {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin-right: 15px;
+    }
+    nav a {
+      color: #f3f3f3;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1rem;
+      position: relative;
+      transition: color 0.3s ease;
+      white-space: nowrap;
+    }
+    nav a::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      background: #fff;
+      bottom: -5px;
+      left: 0;
+      transition: width 0.3s ease;
+    }
+    nav a:hover {
+      color: #ffd700;
+    }
+    nav a:hover::after {
+      width: 100%;
+    }
+    nav a#profileSetupLink {
+      display: none;
+    }
+    #userStatus {
+      color: #ffeb3b;
+      font-weight: 600;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 180px;
+      justify-content: flex-end;
+    }
+    #userStatus button {
+      padding: 3px 8px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      border-radius: 5px;
+      border: none;
+      background: #ff5c5c;
+      color: #fff;
+      transition: background-color 0.3s ease;
+    }
+    #userStatus button:hover {
+      background: #ff2f2f;
+    }
+    main {
+      flex-grow: 1;
+      padding: 20px 30px;
+      background: rgba(255,255,255,0.85);
+      border-radius: 15px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+      color: #2c3e50;
+      text-align: center;
+    }
+    main .welcome h2 {
+      font-size: 2.2rem;
+      margin-bottom: 20px;
+      font-weight: 700;
+      color: #34495e;
+    }
+    main .welcome p {
+      font-size: 1.15rem;
+      line-height: 1.6;
+      max-width: 700px;
+      margin: 0 auto 40px;
+    }
+    main .info h3 {
+      font-size: 1.6rem;
+      margin-bottom: 15px;
+      color: #34495e;
+      font-weight: 600;
+      text-align: left;
+      border-left: 5px solid #9b59b6;
+      padding-left: 12px;
+      margin-top: 30px;
+    }
+    main .info p {
+      font-size: 1rem;
+      line-height: 1.5;
+      text-align: justify;
+      color: #555;
+    }
+    .notice-section {
+      background: #fff8e1;
+      padding: 20px;
+      margin-top: 40px;
+      border-radius: 10px;
+      color: #333;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: left;
+    }
+    .notice-section h3 {
+      margin-bottom: 15px;
+      color: #9b59b6;
+      font-weight: 700;
+      text-align: center;
+    }
+    .notice-section ul {
+      list-style-type: none;
+      padding-left: 0;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .notice-section ul li {
+      border-left: 4px solid #ffca28;
+      padding-left: 12px;
+      margin-bottom: 20px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      padding: 10px 15px;
+    }
+    .notice-section ul li strong {
+      font-size: 1.1rem;
+      color: #6b3f92;
+    }
+    .notice-section ul li small {
+      display: block;
+      color: #777;
+      margin-bottom: 8px;
+    }
+    .notice-section ul li p {
+      margin: 0;
+      font-size: 1rem;
+      line-height: 1.4;
+    }
+    .notice-section ul li img {
+      max-width: 100%;
+      margin-top: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+    .history-section {
+      background: #3c3263;
+      padding: 25px;
+      margin-top: 40px;
+      border-radius: 15px;
+      color: #ffffff;
+      text-align: justify;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+    .history-section h3, .history-section h4 {
+      color: #ffd700;
+      margin-top: 20px;
+      margin-bottom: 10px;
+    }
+    footer {
+      background: rgba(0,0,0,0.7);
+      color: #ddd;
+      text-align: center;
+      padding: 20px 10px;
+      font-size: 0.9rem;
+      letter-spacing: 0.8px;
+      margin-top: 40px;
+      border-radius: 10px;
+    }
+    @media (max-width: 600px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      header h1 {
+        max-width: 100%;
+        margin-bottom: 10px;
+        font-size: 1.4rem;
+      }
+      nav {
+        margin-bottom: 10px;
+      }
+      nav a {
+        margin-left: 0;
+        margin-right: 15px;
+      }
+      main {
+        padding: 20px 15px;
+        border-radius: 10px;
+      }
+      .notice-section ul {
+        max-height: 200px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img id="logoImg" src="https://scontent.fjsr11-1.fna.fbcdn.net/v/t39.30808-1/280296287_100204236039237_7105041015822890169_n.jpg?stp=dst-jpg_s200x200_tt6&_nc_cat=102&ccb=1-7&_nc_sid=2d3e12&_nc_eui2=AeGysAnieWCyQezN6RBAPX4k5lgCilPPhMnmWAKKU8-EyWzwGaf3M1WdmurRPu_BIG6PSrgYKo5IjVTu9LVpoY1L&_nc_ohc=F7lKkA7esoEQ7kNvwGbv8XP&_nc_oc=Adll8zHVKNluL8i2vfr1XHqaxdXRFsCxHbjlx0fDMKjVAnmL4m_Nsxb5iz5EO9CXGqQ&_nc_zt=24&_nc_ht=scontent.fjsr11-1.fna&_nc_gid=RBEITmHeB5oe9zDbmTBEKA&oh=00_AfRb_CUA8XWv0uAKVbL9IAr5RX_vCsyKNuKOhSk_ZlroJA&oe=68784AC5" alt="School Logo" />
+    <h1>ধুনট সরকারি নইম উদ্দিন পাইলট মডেল উচ্চ বিদ্যালয়</h1>
+    <nav>
+      <a href="index.html">হোম</a>
+      <a href="login.html">লগইন</a>
+      <a href="profile.html" id="profileSetupLink">প্রোফাইল সেটআপ</a>
+      <a href="notice.html">নোটিশ</a>
+      <a href="teachers.html">শিক্ষকবৃন্দ</a>
+      <a href="students.html">ছাত্রছাত্রী</a>
+      <a href="gallery.html">বিদ্যালয়ের বিশেষ ছবি</a>
+      <a href="contact.html">যোগাযোগ</a>
+    </nav>
+    <div id="userStatus">লোড হচ্ছে...</div>
+  </header>
+
+  <main>
+    <section class="welcome">
+      <h2>স্বাগতম!</h2>
+      <p>আমাদের বিদ্যালয়ের ওয়েবসাইটে আপনাকে আন্তরিক স্বাগতম।</p>
+    </section>
+
+    <section class="info">
+      <h3>স্কুলের সংক্ষিপ্ত পরিচিতি</h3>
+      <p>ধুনট সরকারি নইম উদ্দিন পাইলট মডেল উচ্চ বিদ্যালয়, বগুড়া জেলার একটি ঐতিহ্যবাহী শিক্ষা প্রতিষ্ঠান।</p>
+    </section>
+
+    <section class="notice-section">
+      <h3>সর্বশেষ নোটিশ</h3>
+      <ul id="homeNoticeList"></ul>
+    </section>
+
+    <section class="history-section">
+      <h3>বিদ্যালয়ের ইতিহাস</h3>
+      <p>ধুনট সরকারি নইম উদ্দিন পাইলট মডেল উচ্চ বিদ্যালয় বাংলাদেশের বগুড়া জেলার ধুনট উপজেলায় অবস্থিত একটি মাধ্যমিক বিদ্যালয়। এটি মাধ্যমিক ও উচ্চ মাধ্যমিক শিক্ষা বোর্ড, রাজশাহী এর অধীনে পরিচালিত।</p>
+      <h4>ইতিহাস:</h4>
+      <p>১৯১২ সালে প্রতিষ্ঠিত বিদ্যালয়টি গিরিশচন্দ্র সরকার ও স্থানীয়দের সহায়তায় প্রতিষ্ঠিত হয়।</p>
+      <h4>নামকরণ:</h4>
+      <p>১৯৪১ সালে বিদ্যালয়টির নাম ধুনট উচ্চ ইংরেজি বিদ্যালয় রাখা হয়।</p>
+      <p>নঈম উদ্দিন তালুকদার জমি ও অর্থ দান করেন, যা অবকাঠামো তৈরিতে ব্যবহৃত হয়।</p>
+      <h4>একাডেমিক কার্যক্রম:</h4>
+      <p>৬ষ্ঠ শ্রেণি থেকে ১০ম শ্রেণি পর্যন্ত পাঠদান হয়।</p>
+    </section>
+  </main>
+
+  <footer>
+    &copy; ২০২৫ ধুনট সরকারি নইম উদ্দিন পাইলট মডেল উচ্চ বিদ্যালয় | সর্বস্বত্ব সংরক্ষিত
+  </footer>
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCaQeqVWyUVW4kIFgox0fOiUKXbQoz1OiM",
+      authDomain: "dhunat-school.firebaseapp.com",
+      projectId: "dhunat-school",
+      storageBucket: "dhunat-school.appspot.com",
+      messagingSenderId: "271256090455",
+      appId: "1:271256090455:web:b34e8be97a26191512b012",
+      measurementId: "G-SVESZH9L61"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    const userStatus = document.getElementById('userStatus');
+    const profileLink = document.getElementById('profileSetupLink');
+
+    auth.onAuthStateChanged(user => {
+      if(user) {
+        const nameOrEmail = user.displayName ? user.displayName : user.email;
+        userStatus.innerHTML = `স্বাগতম, <strong>${nameOrEmail}</strong> <button id="logoutBtn">লগআউট</button>`;
+        profileLink.style.display = 'inline-block';
+        document.getElementById('logoutBtn').onclick = () => auth.signOut().then(() => location.reload());
+      } else {
+        userStatus.textContent = "আপনি লগইন করেননি।";
+        profileLink.style.display = 'none';
+      }
+    });
+
+    function loadNoticesToHome() {
+      const noticeList = document.getElementById('homeNoticeList');
+      const saved = localStorage.getItem('notices');
+      if (!saved || JSON.parse(saved).length === 0) {
+        noticeList.innerHTML = '<li>কোনো নোটিশ পাওয়া যায়নি।</li>';
+        return;
+      }
+      const notices = JSON.parse(saved);
+      noticeList.innerHTML = '';
+      notices.forEach(n => {
+        const li = document.createElement('li');
+        li.innerHTML = `<strong>${n.title}</strong><br><small>${new Date(n.date).toLocaleDateString('bn-BD')}</small><p>${n.content}</p>`;
+        if (n.imageData) li.innerHTML += `<img src="${n.imageData}" alt="নোটিশ ছবি" />`;
+        noticeList.appendChild(li);
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', loadNoticesToHome);
+  </script>
+</body>
+</html>

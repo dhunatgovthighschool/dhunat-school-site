@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>সাইন আপ - ধুনট স্কুল</title>
+</head>
+<body>
+  <h2>নতুন একাউন্ট তৈরি করো</h2>
+  <input type="email" id="email" placeholder="ইমেইল"><br>
+  <input type="password" id="password" placeholder="পাসওয়ার্ড"><br>
+  <button onclick="signUp()">সাইন আপ</button>
+  <p>আগে একাউন্ট ছিল? <a href="login.html">লগইন করো</a></p>
+  <p id="error" style="color:red;"></p>
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      ,
+      authDomain:apiKey: "AIzaSyCaQeqVWyUVW4kIFgox0fOiUKXbQoz1OiM" "dhunat-school.firebaseapp.com",
+      projectId: "dhunat-school",
+      storageBucket: "dhunat-school.appspot.com",
+      messagingSenderId: "271256090455",
+      appId: "1:271256090455:web:b34e8be97a26191512b012",
+      measurementId: "G-SVESZH9L61"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    function signUp() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      auth.createUserWithEmailAndPassword(email, password)
+        .then(user => {
+          alert("সাইন আপ সফল! এখন লগইন করো।");
+          window.location.href = "login.html";
+        })
+        .catch(error => {
+          document.getElementById("error").innerText = error.message;
+        });
+    }
+  </script>
+</body>
+</html>

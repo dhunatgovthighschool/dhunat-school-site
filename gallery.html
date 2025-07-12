@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>বিদ্যালয়ের বিশেষ ছবি </title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri&display=swap');
+
+    body {
+      font-family: 'Hind Siliguri', sans-serif;
+      background: #f0f4f8;
+      margin: 0;
+      padding: 20px;
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
+      color: #333;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #4a3f9a;
+    }
+
+    form {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+      margin-bottom: 40px;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #5a4b9a;
+    }
+
+    input[type="text"],
+    input[type="file"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 18px;
+      border: 1px solid #bbb;
+      border-radius: 6px;
+      font-size: 1rem;
+      outline: none;
+      box-sizing: border-box;
+    }
+
+    button {
+      background: #5a4b9a;
+      color: #fff;
+      font-weight: 700;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #3f3571;
+    }
+
+    .gallery-container {
+      max-height: 450px;
+      overflow-y: auto;
+      background: white;
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+    }
+
+    .gallery-item {
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 20px;
+      margin-bottom: 20px;
+    }
+
+    .gallery-item:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .gallery-item img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 12px;
+      object-fit: cover;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      margin-bottom: 10px;
+    }
+
+    .uploader-name {
+      font-weight: 700;
+      color: #5a4b9a;
+      margin-bottom: 8px;
+      font-size: 1.1rem;
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 10px;
+    }
+
+    .like-btn {
+      cursor: pointer;
+      color: #5a4b9a;
+      font-weight: 600;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: color 0.3s ease;
+    }
+    .like-btn.liked {
+      color: #e91e63;
+    }
+
+    .like-btn:hover {
+      color: #8e24aa;
+    }
+
+    .like-count {
+      font-size: 0.9rem;
+      color: #777;
+    }
+
+    .comments-section {
+      background: #f8f8f8;
+      padding: 10px 15px;
+      border-radius: 10px;
+      max-height: 150px;
+      overflow-y: auto;
+      margin-bottom: 10px;
+    }
+
+    .comment {
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 5px;
+    }
+    .comment:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+    .comment strong {
+      color: #5a4b9a;
+      font-weight: 700;
+    }
+
+    .comment-input-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    .comment-input-group input[type="text"] {
+      flex-grow: 1;
+      padding: 8px 10px;
+      border: 1px solid #bbb;
+      border-radius: 8px;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    .comment-input-group button {
+      background: #5a4b9a;
+      color: white;
+      font-weight: 700;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .comment-input-group button:hover {
+      background: #3f3571;
+    }
+
+    /* Scrollbar style for gallery and comments */
+    .gallery-container::-webkit-scrollbar,
+    .comments-section::-webkit-scrollbar {
+      width: 8px;
+    }
+    .gallery-container::-webkit-scrollbar-thumb,
+    .comments-section::-webkit-scrollbar-thumb {
+      background: #5a4b9a;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>বিদ্যালয়ের বিশেষ ছবি - লাইক ও কমেন্ট সহ</h1>
+
+  <form id="uploadForm">
+    <label for="uploaderName">আপনার নাম</label>
+    <input type="text" id="uploaderName" placeholder="আপনার নাম লিখুন" required />
+
+    <label for="imageFile">ছবি নির্বাচন করুন (স্কুলের ছবি হতে হবে)</label>
+    <input type="file" id="imageFile" accept="image/*" required />
+
+    <button type="submit">ছবি আপলোড করুন</button>
+  </form>
+
+  <div class="gallery-container" id="gallery"></div>
+
+  <script>
+    const form = document.getElementById('uploadForm');
+    const gallery = document.getElementById('gallery');
+
+    // লোকালস্টোরেজ থেকে ছবি লোড
+    function loadGallery() {
+      gallery.innerHTML = '';
+      const savedImages = JSON.parse(localStorage.getItem('schoolSpecialImages') || '[]');
+
+      if (savedImages.length === 0) {
+        gallery.innerHTML = '<p style="text-align:center; color:#777;">এখনও কোনো ছবি আপলোড করা হয়নি।</p>';
+        return;
+      }
+
+      savedImages.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.classList.add('gallery-item');
+
+        div.innerHTML = `
+          <div class="uploader-name">আপলোড করেছেন: ${escapeHTML(item.name)}</div>
+          <img src="${item.imageData}" alt="বিদ্যালয়ের বিশেষ ছবি" />
+
+          <div class="actions">
+            <div class="like-btn ${item.liked ? 'liked' : ''}" data-index="${index}">
+              ❤️ <span class="like-count">${item.likes || 0}</span>
+            </div>
+          </div>
+
+          <div class="comments-section" id="comments-${index}">
+            ${renderComments(item.comments)}
+          </div>
+
+          <form class="comment-form" data-index="${index}">
+            <input type="text" placeholder="কমেন্ট করুন..." required />
+            <button type="submit">পোস্ট</button>
+          </form>
+        `;
+
+        gallery.appendChild(div);
+      });
+
+      // লাইক বাটনে ইভেন্ট যুক্ত করা
+      document.querySelectorAll('.like-btn').forEach(btn => {
+        btn.onclick = function() {
+          const i = this.dataset.index;
+          toggleLike(i);
+        }
+      });
+
+      // কমেন্ট ফর্মে সাবমিট ইভেন্ট
+      document.querySelectorAll('.comment-form').forEach(form => {
+        form.onsubmit = function(e) {
+          e.preventDefault();
+          const idx = this.dataset.index;
+          const input = this.querySelector('input[type="text"]');
+          const commentText = input.value.trim();
+          if(commentText.length === 0) return;
+          addComment(idx, commentText);
+          input.value = '';
+        }
+      });
+    }
+
+    // Like toggle ফাংশন
+    function toggleLike(index) {
+      let savedImages = JSON.parse(localStorage.getItem('schoolSpecialImages') || '[]');
+      let item = savedImages[index];
+
+      if(!item.liked) {
+        item.likes = (item.likes || 0) + 1;
+        item.liked = true;
+      } else {
+        item.likes = Math.max((item.likes || 1) - 1, 0);
+        item.liked = false;
+      }
+
+      savedImages[index] = item;
+      localStorage.setItem('schoolSpecialImages', JSON.stringify(savedImages));
+      loadGallery();
+    }
+
+    // Comment rendering helper
+    function renderComments(comments) {
+      if (!comments || comments.length === 0) return '<p style="color:#999;">কোনো কমেন্ট নেই।</p>';
+      return comments.map(c => `<div class="comment"><strong>${escapeHTML(c.name)}</strong>: ${escapeHTML(c.text)}</div>`).join('');
+    }
+
+    // Add comment ফাংশন
+    function addComment(index, text) {
+      let savedImages = JSON.parse(localStorage.getItem('schoolSpecialImages') || '[]');
+      if(!savedImages[index].comments) savedImages[index].comments = [];
+
+      // এখানে নাম ইউজারের নাম দিয়ে নেব, ধরে নিচ্ছি শুধু নাম আছে না হলে "অজানা" দিয়ে দিবো
+      // আপনি চাইলে অন্যভাবে ইউজারকে নাম নিতে পারেন।
+      // কিন্তু যেহেতু আপলোড ফর্মে নাম ছিল, তাই ঐ নাম ইউজারের নাম ধরা হবে
+      const userName = savedImages[index].name || 'অজানা';
+
+      savedImages[index].comments.push({name: userName, text: text});
+      localStorage.setItem('schoolSpecialImages', JSON.stringify(savedImages));
+      loadGallery();
+    }
+
+    // Escape HTML (XSS এড়াতে)
+    function escapeHTML(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // Form Submit - ছবি আপলোড
+    form.addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const uploaderName = document.getElementById('uploaderName').value.trim();
+      const imageFile = document.getElementById('imageFile').files[0];
+
+      if (!uploaderName) {
+        alert('অনুগ্রহ করে আপনার নাম লিখুন।');
+        return;
+      }
+      if (!imageFile) {
+        alert('অনুগ্রহ করে একটি ছবি নির্বাচন করুন।');
+        return;
+      }
+
+      if (!imageFile.type.startsWith('image/')) {
+        alert('দয়া করে একটি বৈধ ছবি ফাইল নির্বাচন করুন।');
+        return;
+      }
+
+      const reader = new FileReader();
+
+      reader.onload = function(e) {
+        const imageData = e.target.result;
+
+        let savedImages = JSON.parse(localStorage.getItem('schoolSpecialImages') || '[]');
+
+        savedImages.unshift({  // নতুন ছবি উপরে দেখানোর জন্য unshift
+          name: uploaderName,
+          imageData: imageData,
+          likes: 0,
+          liked: false,
+          comments: []
+        });
+
+        localStorage.setItem('schoolSpecialImages', JSON.stringify(savedImages));
+
+        form.reset();
+        loadGallery();
+
+        alert('ছবি সফলভাবে আপলোড হয়েছে!');
+      };
+
+      reader.readAsDataURL(imageFile);
+    });
+
+    window.addEventListener('DOMContentLoaded', loadGallery);
+  </script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>অ্যাডমিন প্যানেল - ধুনট সরকারি নইম উদ্দিন পাইলট মডেল উচ্চ বিদ্যালয়</title>
+  <style>
+    body {
+      font-family: 'Hind Siliguri', sans-serif;
+      background: linear-gradient(135deg, #6b3f92, #2a4d8f);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+    }
+    button {
+      padding: 12px 30px;
+      font-size: 1.1rem;
+      background-color: #4a3f9a;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background-color: #3a3279;
+    }
+  </style>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCaQeqVWyUVW4kIFgox0fOiUKXbQoz1OiM",
+      authDomain: "dhunat-school.firebaseapp.com",
+      projectId: "dhunat-school",
+      storageBucket: "dhunat-school.firebasestorage.app",
+      messagingSenderId: "271256090455",
+      appId: "1:271256090455:web:b34e8be97a26191512b012",
+      measurementId: "G-SVESZH9L61"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    // পেজ লোড হলে চেক করবে ইউজার লগইন আছে কিনা এবং অ্যাডমিন কিনা
+    window.onload = () => {
+      auth.onAuthStateChanged(user => {
+        if (!user) {
+          // লগইন না থাকলে login পেজে পাঠাবে
+          window.location.href = "login.html";
+        } else if (user.email !== "exptlikhonsarkar@gmail.com") {
+          // যদি অ্যাডমিন না হয়, হোম পেজে পাঠাবে
+          window.location.href = "index.html";
+        }
+      });
+    };
+
+    function logout() {
+      auth.signOut().then(() => {
+        window.location.href = "login.html";
+      });
+    }
+  </script>
+</head>
+<body>
+  <h1>স্বাগতম, অ্যাডমিন!</h1>
+  <p>এটি আপনার প্রশাসনিক প্যানেল। এখানে আপনি বিশেষ প্রশাসনিক কাজ করতে পারবেন।</p>
+  <button onclick="logout()">লগআউট</button>
+</body>
+</html>

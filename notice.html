@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>নোটিশ বোর্ড</title>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+
+  <style>
+    body {
+      font-family: 'Hind Siliguri', sans-serif;
+      padding: 20px;
+      background: #f4f4f4;
+      color: #333;
+    }
+
+    h2 {
+      text-align: center;
+      color: #4a148c;
+    }
+
+    form {
+      margin-bottom: 30px;
+      padding: 20px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      padding: 10px 20px;
+      background: #6a1b9a;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .notice {
+      background: #fff8e1;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-left: 5px solid #ffca28;
+      border-radius: 5px;
+      position: relative;
+    }
+
+    .notice img {
+      max-width: 100%;
+      margin-top: 10px;
+      border-radius: 8px;
+    }
+
+    .date {
+      font-size: 0.9rem;
+      color: #666;
+      margin-top: 8px;
+    }
+
+    .remove-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #e53935;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      padding: 5px 10px;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+  <h2>নোটিশ বোর্ড</h2>
+
+  <section id="noticeFormSection" style="display:none;">
+    <form id="noticeForm">
+      <input type="text" id="title" placeholder="নোটিশ শিরোনাম" required>
+      <textarea id="content" rows="4" placeholder="নোটিশ বিবরণ" required></textarea>
+      <input type="file" id="imageInput">
+      <button type="submit">নোটিশ যোগ করুন</button>
+    </form>
+  </section>
+
+  <div id="noticeList"></div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCaQeqVWyUVW4kIFgox0fOiUKXbQoz1OiM",
+      authDomain: "dhunat-school.firebaseapp.com",
+      projectId: "dhunat-school",
+      storageBucket: "dhunat-school.firebasestorage.app",
+      messagingSenderId: "271256090455",
+      appId: "1:271256090455:web:b34e8be97a26191512b012",
+      measurementId: "G-SVESZH9L61"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const ADMIN_EMAIL = "exptlikhonsarkar@gmail.com";
+
+    let currentUser = null;
+    auth.onAuthStateChanged(user => {
+      currentUser = user;
+      if (user && user.email === ADMIN_EMAIL) {
+        document.getElementById('noticeFormSection').style.display = 'block';
+      }
+      loadNotices();
+    });
+
+    function loadNotices() {
+      const list = document.getElementById('noticeList');
+      const saved = localStorage.getItem('notices');
+      const notices = saved ? JSON.parse(saved) : [];
+      list.innerHTML = '';
+
+      if (notices.length === 0) {
+        list.innerHTML = '<p>কোনো নোটিশ নেই।</p>';
+        return;
+      }
+
+      notices.forEach((n, index) => {
+        const div = document.createElement('div');
+        div.className = 'notice';
+
+        const dateStr = new Date(n.date).toLocaleDateString('bn-BD', {
+          year: 'numeric', month: 'long', day: 'numeric'
+        });
+
+        div.innerHTML = `
+          <h4>${n.title}</h4>
+          <p>${n.content}</p>
+          <div class="date">তারিখ: ${dateStr}</div>
+          ${n.imageData ? `<img src="${n.imageData}" alt="নোটিশ">` : ''}
+          ${(currentUser && currentUser.email === ADMIN_EMAIL)
+            ? `<button class="remove-btn" onclick="removeNotice(${index})">মুছুন</button>` : ''}
+        `;
+
+        list.appendChild(div);
+      });
+    }
+
+    function removeNotice(index) {
+      const confirmDelete = confirm("আপনি কি এই নোটিশটি মুছে ফেলতে চান?");
+      if (!confirmDelete) return;
+
+      const saved = localStorage.getItem('notices');
+      let notices = saved ? JSON.parse(saved) : [];
+      notices.splice(index, 1);
+      localStorage.setItem('notices', JSON.stringify(notices));
+      loadNotices();
+    }
+
+    const form = document.getElementById('noticeForm');
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const title = document.getElementById('title').value;
+      const content = document.getElementById('content').value;
+      const imageInput = document.getElementById('imageInput');
+      const reader = new FileReader();
+
+      reader.onload = function(event) {
+        const imageData = imageInput.files[0] ? event.target.result : null;
+        const saved = localStorage.getItem('notices');
+        const notices = saved ? JSON.parse(saved) : [];
+
+        const newNotice = {
+          title,
+          content,
+          imageData,
+          date: new Date().toISOString()
+        };
+
+        notices.unshift(newNotice);
+        localStorage.setItem('notices', JSON.stringify(notices));
+        form.reset();
+        loadNotices();
+      };
+
+      if (imageInput.files[0]) {
+        reader.readAsDataURL(imageInput.files[0]);
+      } else {
+        reader.onload({ target: { result: null } });
+      }
+    });
+  </script>
+</body>
+</html>

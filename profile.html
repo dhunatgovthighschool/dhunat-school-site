@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>প্রোফাইল সেটআপ - ধুনট সরকারি নইম উদ্দিন পাইলট মডেল উচ্চ বিদ্যালয়</title>
+  <style>
+    body {
+      font-family: 'Hind Siliguri', sans-serif;
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #f9f9f9;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      color: #6b3f92;
+      margin-bottom: 30px;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: 600;
+    }
+    input[type="text"], input[type="email"], input[type="date"], input[type="password"], select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 6px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+    button {
+      margin-top: 25px;
+      padding: 10px 18px;
+      background: #6b3f92;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background: #572f72;
+    }
+    #message, #error {
+      margin-top: 20px;
+      font-weight: 600;
+      text-align: center;
+    }
+    #message {
+      color: green;
+    }
+    #error {
+      color: red;
+    }
+    #logoutBtn {
+      background: #ff5c5c;
+      margin-top: 15px;
+      width: 100%;
+    }
+    #logoutBtn:hover {
+      background: #ff2f2f;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>প্রোফাইল সেটআপ</h1>
+
+  <div id="userInfo">
+    <label>ইমেইল (পরিবর্তনযোগ্য নয়):</label>
+    <input type="email" id="email" readonly />
+
+    <label>আপনার নাম (Display Name):</label>
+    <input type="text" id="displayName" placeholder="আপনার নাম লিখুন" />
+
+    <label>ঠিকানা:</label>
+    <input type="text" id="address" placeholder="আপনার ঠিকানা লিখুন" />
+
+    <label>ক্লাস:</label>
+    <select id="class">
+      <option value="">ক্লাস নির্বাচন করুন</option>
+      <option value="৬ষ্ঠ">৬ষ্ঠ</option>
+      <option value="৭ম">৭ম</option>
+      <option value="৮ম">৮ম</option>
+      <option value="৯ম">৯ম</option>
+      <option value="১০ম">১০ম</option>
+      <option value="অন্য">অন্য</option>
+    </select>
+
+    <label>রোল নম্বর:</label>
+    <input type="text" id="roll" placeholder="রোল নম্বর লিখুন" />
+
+    <label>জন্ম তারিখ:</label>
+    <input type="date" id="dob" />
+
+    <hr style="margin: 30px 0;">
+
+    <label>পাসওয়ার্ড পরিবর্তন করুন:</label>
+    <input type="password" id="newPassword" placeholder="নতুন পাসওয়ার্ড" />
+    <input type="password" id="confirmPassword" placeholder="পাসওয়ার্ড নিশ্চিত করুন" />
+    
+    <button id="updateBtn">আপডেট করুন</button>
+    <button id="logoutBtn">লগআউট</button>
+
+    <div id="message"></div>
+    <div id="error"></div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCaQeqVWyUVW4kIFgox0fOiUKXbQoz1OiM",
+      authDomain: "dhunat-school.firebaseapp.com",
+      projectId: "dhunat-school",
+      storageBucket: "dhunat-school.firebasestorage.app",
+      messagingSenderId: "271256090455",
+      appId: "1:271256090455:web:b34e8be97a26191512b012",
+      measurementId: "G-SVESZH9L61"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    const emailInput = document.getElementById('email');
+    const displayNameInput = document.getElementById('displayName');
+    const addressInput = document.getElementById('address');
+    const classSelect = document.getElementById('class');
+    const rollInput = document.getElementById('roll');
+    const dobInput = document.getElementById('dob');
+    const newPasswordInput = document.getElementById('newPassword');
+    const confirmPasswordInput = document.getElementById('confirmPassword');
+
+    const updateBtn = document.getElementById('updateBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    const messageDiv = document.getElementById('message');
+    const errorDiv = document.getElementById('error');
+
+    let currentUser = null;
+
+    // ইউজার লগইন চেক
+    auth.onAuthStateChanged(user => {
+      if (!user) {
+        alert('আপনি লগইন করেননি! প্রথমে লগইন করুন।');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      currentUser = user;
+      emailInput.value = user.email;
+      displayNameInput.value = user.displayName || '';
+
+      // ইউজারের ডাটা Firestore থেকে লোড করা
+      loadUserProfile();
+    });
+
+    function loadUserProfile() {
+      db.collection('users').doc(currentUser.uid).get()
+        .then(doc => {
+          if(doc.exists){
+            const data = doc.data();
+            addressInput.value = data.address || '';
+            classSelect.value = data.class || '';
+            rollInput.value = data.roll || '';
+            dobInput.value = data.dob || '';
+          }
+        })
+        .catch(error => {
+          console.error("ডাটা লোড করতে সমস্যা হয়েছে:", error);
+        });
+    }
+
+    updateBtn.addEventListener('click', async () => {
+      messageDiv.textContent = '';
+      errorDiv.textContent = '';
+
+      const newName = displayNameInput.value.trim();
+      const address = addressInput.value.trim();
+      const selectedClass = classSelect.value;
+      const roll = rollInput.value.trim();
+      const dob = dobInput.value;
+      const newPassword = newPasswordInput.value;
+      const confirmPassword = confirmPasswordInput.value;
+
+      if (!newName) {
+        errorDiv.textContent = 'অনুগ্রহ করে নাম লিখুন।';
+        return;
+      }
+      if (!address) {
+        errorDiv.textContent = 'ঠিকানা লিখুন।';
+        return;
+      }
+      if (!selectedClass) {
+        errorDiv.textContent = 'ক্লাস নির্বাচন করুন।';
+        return;
+      }
+      if (!roll) {
+        errorDiv.textContent = 'রোল নম্বর লিখুন।';
+        return;
+      }
+      if (!dob) {
+        errorDiv.textContent = 'জন্ম তারিখ দিন।';
+        return;
+      }
+      if(newPassword || confirmPassword){
+        if(newPassword !== confirmPassword){
+          errorDiv.textContent = 'পাসওয়ার্ড মিলছে না।';
+          return;
+        }
+        if(newPassword.length < 6){
+          errorDiv.textContent = 'পাসওয়ার্ড অন্তত ৬ অক্ষরের হতে হবে।';
+          return;
+        }
+      }
+
+      try {
+        // Firebase Auth এ displayName আপডেট
+        await currentUser.updateProfile({ displayName: newName });
+
+        // Firestore এ ডাটা আপডেট
+        await db.collection('users').doc(currentUser.uid).set({
+          address: address,
+          class: selectedClass,
+          roll: roll,
+          dob: dob,
+        }, { merge: true });
+
+        // পাসওয়ার্ড পরিবর্তন (যদি দেওয়া হয়)
+        if(newPassword){
+          await currentUser.updatePassword(newPassword);
+        }
+
+        messageDiv.textContent = 'আপনার প্রোফাইল সফলভাবে আপডেট হয়েছে।';
+        newPasswordInput.value = '';
+        confirmPasswordInput.value = '';
+      }
+      catch (error) {
+        console.error(error);
+        errorDiv.textContent = 'আপডেট করতে সমস্যা হয়েছে: ' + error.message;
+      }
+    });
+
+    logoutBtn.addEventListener('click', () => {
+      auth.signOut().then(() => {
+        alert('সফলভাবে লগআউট হয়েছেন।');
+        window.location.href = 'index.html';
+      });
+    });
+  </script>
+</body>
+</html>
